@@ -1,4 +1,6 @@
 
+import { useRouter } from 'next/router';
+
 // Styles
 import styled from 'styled-components';
 import { Avatar } from '@mui/material';
@@ -14,6 +16,7 @@ import { collection, query, where } from 'firebase/firestore';
 
 const Chat = ({ id, users }) => {
 
+    const router = useRouter();
     const [user] = useAuthState(auth);
 
     // query from users data
@@ -24,8 +27,12 @@ const Chat = ({ id, users }) => {
     const recipient = recipientSnapshot?.docs?.[0]?.data();
     const recipientEmail = getRecipientEmail(users, user);
     
+    const enterChat = () => {
+        router.push(`/chat/${id}`); // id comes from our prop.
+    }
+    
     return ( 
-        <Container>
+        <Container onClick={enterChat}>
             {
                 recipient ? 
                     <UserAvatar src={recipient?.photoURL} /> :

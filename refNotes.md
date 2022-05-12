@@ -165,8 +165,6 @@ Now, we'll work on the objectives that needed to be done by our function called 
 - For now, we'l want to create a document based on these conditions and add them to our database.
 
 
-
-
 ## Steps.... 
 
 
@@ -205,3 +203,4 @@ You'll need to import `useAuthState` and `auth` to get the current user who is l
 
 ### Time to get the recipient's photo.
 
+### What happens when you click on the chat? We'll use Next.js router now.

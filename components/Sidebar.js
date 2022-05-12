@@ -14,12 +14,16 @@ import { collection, doc, setDoc, query, where } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
 
+// Components
+import Chat from '../components/Chat';
+
 const Sidebar = () => {
 
     const [user] = useAuthState(auth);
     const chatsCollection = collection(db, 'chats'); // Get a reference to the "chats" colelction.
     const chatsQuery = query(chatsCollection, where("users", "array-contains", user.email)); // Query the chats collection and check if the data inside of it, which is an array called users, contains the user email.
     const [chatsSnapshot] = useCollection(chatsQuery);
+
 
     const createChat = () => {
         const input = prompt('Please enter an email address for the user you with to chat with')
@@ -63,6 +67,11 @@ const Sidebar = () => {
             <SidebarButton onClick={createChat}>Start a new chat</SidebarButton>
 
             {/* List of Chats */}
+            {
+                chatsSnapshot?.docs.map(chat => (
+                    <Chat key={chat.id} id={chat.id} user={chat.data().users} />
+                ))
+            }
 
 
 

@@ -20,6 +20,7 @@ import Chat from '../components/Chat';
 const Sidebar = () => {
 
     const [user] = useAuthState(auth);
+    // Chats collection
     const chatsCollection = collection(db, 'chats'); // Get a reference to the "chats" colelction.
     const chatsQuery = query(chatsCollection, where("users", "array-contains", user.email)); // Query the chats collection and check if the data inside of it, which is an array called users, contains the user email.
     const [chatsSnapshot] = useCollection(chatsQuery);
@@ -35,7 +36,7 @@ const Sidebar = () => {
         // Is the email valid?
         if (EmailValidator.validate(input) && !chatAlreadyExists(input) && input !== user.email) {
             // This is where we need to add the chat into the database collection.
-            // To continue we need to have login fuctionalities set up.
+            // To continue we need to have login functionalities set up.
             setDoc(doc(chatsCollection), {
                 users: [
                     user.email,
@@ -50,7 +51,7 @@ const Sidebar = () => {
     return ( 
         <Container>
             <Header>
-                <UserAvatar onClick={() => signOut(auth)} />
+                <UserAvatar src={user?.photoURL} onClick={() => signOut(auth)} />
                 <IconsContainer>
                     <IconButton>
                         <MoreVertIcon />
@@ -69,7 +70,7 @@ const Sidebar = () => {
             {/* List of Chats */}
             {
                 chatsSnapshot?.docs.map(chat => (
-                    <Chat key={chat.id} id={chat.id} user={chat.data().users} />
+                    <Chat key={chat.id} id={chat.id} users={chat.data().users} />
                 ))
             }
 

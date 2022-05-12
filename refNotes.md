@@ -52,7 +52,7 @@ Tip: If you want to override the Material UI styles you use `&&& {}`.
 Create a file at the root directory called `firebase.js`. This is where all of the configuration for firebase will be done.
 
 1. You want create a new project at [Firebase.](https://firebase.google.com)
-    - Create the firesstore database
+    - Create the firestore database
     - Create the authentication which for this app we'll be signing in using Google.
     - Initialize the backend.
 
@@ -63,4 +63,30 @@ Create a file at the root directory called `firebase.js`. This is where all of t
         const app = !getApps().length ? initializeApp(config)
             : getApp();
 
-4. 
+4. Create database variable that holds `getFirestore(app)`.
+
+5. Create auth.
+
+6. Create googleProvider.
+
+7. Export the variables just created.
+
+## Creating Login and Loading
+
+In `_app.js` page you'll want to render a login page if there aren't any users.
+
+You to that with the following:
+
+        if (!users) return <Login />
+
+But where do you get the information on users from?
+
+- You do so using react-firebase-hooks. One of the hooks is `useAuthState` which you'll need to import from `react-firebase-hooks/auth`.
+- You can get user and loading from `useAuthState`.
+- Pass in the `auth` imported from `firebase.js`
+
+Now you have access to whether a user is logged in and also loading. 
+
+Before checking for users you can return `<Loading />` if it's loading.
+
+Now you need to created both the `<Login />` and `<Loading />`.

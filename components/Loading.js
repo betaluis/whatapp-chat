@@ -1,4 +1,4 @@
-import { Circle } from "better-react-spinkit";
+import { CircularProgress } from "@mui/material";
 
 const Loading = () => {
     return ( 
@@ -10,7 +10,9 @@ const Loading = () => {
                     height={200}
                     style={{ marginBottom: 10 }}
                 />
-                <Circle color="#3cbc28" size={60} />
+                <div style={{ display: "grid", placeItems: "center"}}>
+                    <CircularProgress color="success" size={80} />
+                </div>
             </div>
         </center>
      );

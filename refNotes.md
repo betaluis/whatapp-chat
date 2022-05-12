@@ -122,6 +122,51 @@ Flesh it out:
 
 Style it as you wish.
 
+### Creating "Users" collection
+
+Go back to the `_app.js` file and import `useEffect()`.  
+
+We're going to use `useEffect()` to create a new user if this is the first time the user has signed in.
+
+We're going to need some functions from `firebase/firestore` to help us accomplish this, and also a react firebase hook that will make our lives easier.
+
+- `auth` and `db` from `firebase.js`
+- `doc`, `setDoc`, and `serverTimestamp` from `firebase/firestore`
+- `useAuthState` from `react-firebase-hooks/auth`
+
+This is how we're going to create the collection using firebase V9:
+
+        useEffect(() => {
+            setDoc(doc(db, "users", user.uid),{
+                email: user.email,
+                photoURL: user.photoURL,
+                timestamp: serverTimestamp(),
+            }, { merge: true })
+        }, [user])
+
+- Now every time that a user logs in for the first time it will be added to the "users" collection. If the user already exists in the collection it will just overwrite (merge) the document.
+
+## Back to the Sidebar Component
+
+Remember the `signOut()` above? We can now import it from "firebase/auth" and call it when the `<UserAvatar>` is clicked. Remember to pass in `auth`.
+
+Now, we'll work on the objectives that needed to be done by our function called `createChat()`.
+
+- We are already keeping track of the input, and if there's no input, it returns null, but now we need to validate this input. To do this we'll import a package called `EmailValidator` from `email-validator`. Import everything.
+
+- Check if the emails is valid like this:
+         
+         if (EmailValidator.validate(input)) {};
+
+- Also, check that the input, which is the recipient who the user wants to chat with, is not the same as the user's email who is currently logged in.
+
+- There is one more condition that we will add later that will check if the chat is already created.
+
+- For now, we'l want to create a document based on these conditions and add them to our database.
+
+
+
+
 ## Steps.... 
 
 

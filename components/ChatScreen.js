@@ -1,5 +1,5 @@
 // React
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 // Next
 import { useRouter } from 'next/router';
@@ -28,8 +28,8 @@ const ChatScreen = ({ chat, messages }) => {
 
     const [user] = useAuthState(auth);
     const router = useRouter();
-    // const [input, setInput] = useState('');
     const chatInput = useRef();
+    const endOfMessagesRef = useRef(null);
 
     const chatDocRef = doc(db, 'chats', router.query.id)
     const subCollection = collection(chatDocRef, "messages")
@@ -81,11 +81,27 @@ const ChatScreen = ({ chat, messages }) => {
 
         chatInput.current.value = '';
         chatInput.current.focus();
+        scrollToBottom();
 
     }
 
+    // Scroll to the bottom of the messages
+    const scrollToBottom = () => {
+        endOfMessagesRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        })
+    }
+
+    // Scroll to the bottom when the page first loads.
+    useEffect(() => {
+        scrollToBottom();
+    }, [messagesSnapshot])
+
     const recipientEmail = getRecipientEmail(chat.users, user);
     const recipientData = recipientEmailSnapshot?.docs?.[0]?.data();
+
+    console.log(recipientData);
 
     return (
         <Container>
@@ -93,7 +109,7 @@ const ChatScreen = ({ chat, messages }) => {
                 {
                     recipientData ? 
                         <Avatar src={ recipientData?.photoURL } /> : 
-                        <Avatar src={recipientEmail[0]} />
+                        <Avatar>{recipientEmail[0]}</Avatar>
                 }
                 <HeaderInformation>
                     <h3>{recipientEmail}</h3>
@@ -122,7 +138,7 @@ const ChatScreen = ({ chat, messages }) => {
 
             <MessageContainer>
                 {showMessage()}
-                <EndOfMessage />
+                <EndOfMessage ref={endOfMessagesRef} />
             </MessageContainer>
 
             <InputContainer onSubmit={sendMessage}>
@@ -142,6 +158,9 @@ const ChatScreen = ({ chat, messages }) => {
 export default ChatScreen;
 
 const Container = styled.div`
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100%;
 `;
 
 const Header = styled.div`
@@ -159,9 +178,12 @@ const Header = styled.div`
 const HeaderInformation = styled.div`
     margin-left: 15px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
 
-    > h3 {
-        margin-bottom: 3px;
+    > h3, p {
+        margin: 0;
     }
     > p {
         font-size: 14px;
@@ -175,10 +197,19 @@ const HeaderIcons = styled.div`
 const MessageContainer = styled.div`
     padding: 30px;
     background-color: #e5ded8;
-    min-height: 90vh;
+    overflow-Y: scroll;
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 `;
 
-const EndOfMessage = styled.div``;
+const EndOfMessage = styled.div`
+    padding-bottom: 40px;
+`;
 
 const Input = styled.input`
     flex: 1;

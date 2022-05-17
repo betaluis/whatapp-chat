@@ -203,7 +203,7 @@ You'll need to import `useAuthState` and `auth` to get the current user who is l
 
 ### Time to get the recipient's photo.
 
-### What happens when you click on the chat? We'll use Next.js router now.
+## What happens when you click on the chat? We'll use Next.js router now.
 
 ### Building out the Chat Screen
 
@@ -212,3 +212,21 @@ You'll need to import `useAuthState` and `auth` to get the current user who is l
 #### Adding Messages
 
 #### End of Messages
+
+#### Adding last seen
+- Create time_ago
+- Create the TimeAgo component
+
+## Styling the messages
+
+### Determine the type of message
+
+#### Add Timestamp to see the time the message was sent
+- `npm install moment`
+- `{message.timestamp ? moment(message.timestamp).format('LT) : "..."}`
+- `<Timestamp>` ---- you want to add this styled component along with its styles.
+
+#### Scroll to the bottom
+
+- Create helper function
+

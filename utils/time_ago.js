@@ -34,6 +34,7 @@ const time_ago = (time) => {
         while ( format = time_formats[i++] )
             if ( seconds < format[0] ) {
                 if ( seconds < 300 ) {
+                    /* This shows "just now" for 5 minutes and below */
                     return "Just now"
                 } else {
                     return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token

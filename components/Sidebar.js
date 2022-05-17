@@ -1,3 +1,7 @@
+// Next
+import { useRouter } from 'next/router';
+
+// Styles
 import styled from 'styled-components';
 import * as EmailValidator from 'email-validator';
 
@@ -10,7 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 // Firebase
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
-import { collection, doc, setDoc, query, where } from 'firebase/firestore';
+import { collection, doc, setDoc, query, where, getDocs } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
 
@@ -21,12 +25,15 @@ const Sidebar = () => {
 
     const [user] = useAuthState(auth);
     // Chats collection
-    const chatsCollection = collection(db, 'chats'); // Get a reference to the "chats" colelction.
+    const chatsCollection = collection(db, 'chats'); // Get a reference to the "chats" collection.
     const chatsQuery = query(chatsCollection, where("users", "array-contains", user.email)); // Query the chats collection and check if the data inside of it, which is an array called users, contains the user email.
     const [chatsSnapshot] = useCollection(chatsQuery);
 
+    // Router
+    const router = useRouter();
 
-    const createChat = () => {
+
+    const createChat = async () => {
         const input = prompt('Please enter an email address for the user you with to chat with')
         if (!input) return null;
 
@@ -37,7 +44,7 @@ const Sidebar = () => {
         if (EmailValidator.validate(input) && !chatAlreadyExists(input) && input !== user.email) {
             // This is where we need to add the chat into the database collection.
             // To continue we need to have login functionalities set up.
-            setDoc(doc(chatsCollection), {
+            await setDoc(doc(chatsCollection), {
                 users: [
                     user.email,
                     input
@@ -45,6 +52,13 @@ const Sidebar = () => {
             }, {merge: true});
         } 
 
+        // Open the chat that was just created
+        const createdChatQuery = query(chatsCollection, where("users", "array-contains", input))
+        const createdChatSnapshot = await getDocs(createdChatQuery);
+
+        const createdChatId = createdChatSnapshot?.docs?.[0]?.id;
+
+        router.push(`/chat/${createdChatId}`)
     }
 
     

@@ -14,7 +14,6 @@ const time_ago = (time) => {
             time = +new Date();
     }
 
-
     const time_formats = [
         [60, "seconds", 1],
         [3600, "minutes", 60],
@@ -27,28 +26,18 @@ const time_ago = (time) => {
     ]
 
     let seconds = (+new Date() - time) / 1000,
-        token = "ago",
-        list_choice = 1
-
-    console.log("first time", seconds)
-
-    if ( seconds == time_formats[0][0] ) {
-        return "Just now"
-    }
-
-    if ( seconds < 0 ) {
-        seconds = Math.abs(seconds)
-        token = "from now"
-        list_choice = 2
-    }
+        token = "ago"
 
     let i = 0,
         format
      
         while ( format = time_formats[i++] )
             if ( seconds < format[0] ) {
-                console.log(seconds / 1)
-                return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token
+                if ( seconds < 60 ) {
+                    return "Just now"
+                } else {
+                    return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token
+                }
             }
     return time
             

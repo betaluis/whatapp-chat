@@ -1,5 +1,5 @@
 // React
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 // Next
 import { useRouter } from 'next/router';
@@ -28,7 +28,8 @@ const ChatScreen = ({ chat, messages }) => {
 
     const [user] = useAuthState(auth);
     const router = useRouter();
-    const [input, setInput] = useState('');
+    // const [input, setInput] = useState('');
+    const chatInput = useRef();
 
     const chatDocRef = doc(db, 'chats', router.query.id)
     const subCollection = collection(chatDocRef, "messages")
@@ -63,6 +64,7 @@ const ChatScreen = ({ chat, messages }) => {
 
     const sendMessage = (e) => {
         e.preventDefault();
+        console.log(chatInput.current.value);
 
 
         // Updates "last seen" 
@@ -72,12 +74,13 @@ const ChatScreen = ({ chat, messages }) => {
 
         addDoc(subCollection, {
             timestamp: serverTimestamp(),
-            message: input,
+            message: chatInput.current.value,
             user: user.email,
             photoURL: user.photoURL
-        })
+        }) 
 
-        setInput('')
+        chatInput.current.value = '';
+        chatInput.current.focus();
 
     }
 
@@ -122,13 +125,12 @@ const ChatScreen = ({ chat, messages }) => {
                 <EndOfMessage />
             </MessageContainer>
 
-            <InputContainer>
+            <InputContainer onSubmit={sendMessage}>
                 <InsertEmoticonOutlined />
                 <Input 
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
+                    ref={chatInput}
                 />
-                <button hidden disabled={!input} type="submit" onClick={sendMessage}>
+                <button hidden disabled={!chatInput} type="submit" onClick={sendMessage}>
                     Send Message
                 </button>
                 <Mic />

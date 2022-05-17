@@ -204,3 +204,11 @@ You'll need to import `useAuthState` and `auth` to get the current user who is l
 ### Time to get the recipient's photo.
 
 ### What happens when you click on the chat? We'll use Next.js router now.
+
+### Building out the Chat Screen
+
+#### Show Messages
+
+#### Adding Messages
+
+#### End of Messages

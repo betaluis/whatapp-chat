@@ -39,10 +39,10 @@ Tip: If you want to override the Material UI styles you use `&&& {}`.
 
         onClick={() => signOut(auth)};
 
-- When the user clicks the `SidebarButton` that says "Start a new chat", the `createChat` function should be envoked. Create the function, but it's a placeholder for now until we get the authentication and database working.
+- When the user clicks the `SidebarButton` that says "Start a new chat", the `createChat` function should be invoked. Create the function, but it's a placeholder for now until we get the authentication and database working.
 
 - `createChat()` function should prompt a message asking the user to type in the email that they want to send a message to. This value will be stored in a variable called `input`. **If there is no input, return null.**
-    - Two things objectives with this function:
+    - Two objectives with this function:
         1. Check if the chat already exists.
         2. Validate that the email entered is valid.
     - Just add comments as placeholders and we'll come back to this.
@@ -158,11 +158,80 @@ Now, we'll work on the objectives that needed to be done by our function called 
          
          if (EmailValidator.validate(input)) {};
 
-- Also, check that the input, which is the recipient who the user wants to chat with, is not the same as the user's email who is currently logged in.
+- Also, check that the input, which is the recipient who the user wants to chat with, is not the same as the user's email who is currently logged in. Do so like this...
 
-- There is one more condition that we will add later that will check if the chat is already created.
+        if (EmailValidator.validate(input) && input !== user.email) {};
 
-- For now, we'l want to create a document based on these conditions and add them to our database.
+- There is one more condition that we will add in a bit that will check if the chat is already created.
+
+- For now, we'll want to create a document based on these conditions and add them to our database.
+
+### Adding a document to our database (firebase v9):
+
+First we need to get a reference to the `chats` collection.
+
+        const chatsCollection = collection(db, "chats")
+
+* The `db` comes from our firebase config file.
+
+Next, we need a query in the `chatsCollection` that will get us every chat where the array inside of `users` contains the `user.email`. This is what that looks like:
+
+        const chatsQuery = query(chatsCollection, where("users", "array-contains", user.email));
+
+- You'll need to import `query()` and `where()` from `firebase/firestore`.
+
+Now our third variable will be a snapshot of that query. This is how you get that.
+
+        const chatsSnapshot = useCollection(chatsQuery);
+
+- Import `useCollection()` from `firebase/firestore`
+
+Within the if statement that we just created to validate the input we will create the new document.
+
+First I'll give you what you need and you can try to do it yourself before looking at the solution.
+
+What you'll need is:
+- `setDoc()` to create a new document. Takes in a doc reference, the document you want to create, and if the new document will merge with the old or overwrite it.
+- `doc()` as a doc reference.
+- `chatsCollection` as the collection you'll place the documents in.
+- Next, an object containing our new document with the following:
+    - A key of `users` with the value being an array.
+    - Inside the array you'll have two values.
+        1. `user.email`
+        2. `input`
+- Lastly, an object with a key of `merge` and a value of `true`
+
+This is what it would look like. TRY IT BY YOURSELF FIRST!
+
+    await setDoc(doc(chatsCollection), {
+        users: [
+            user.email,
+            input
+        ]
+    }, { merge: true })
+
+### Checking if the chat already exists
+
+Now we're going to check if the chat that was created already exists, if so, it will not create a new chat with the same recipient.
+
+Create a function and call it `chatAlreadyExists()` and receive an parameter named `recipientEmail`.
+
+Inside of this function we're going to use the `chatsSnapshot` and go into the `docs` and `find()` a chat. Within that chat, you'll want to find the `user` that matches the `recipientEmail` and check if the length is greater than 0. If it's greater than zero then that means there's a user that matches the `recipientEmail` so that chat has already been created. We want to make sure that this check returns `false` for sure, even if it's `falsy`. We can do this by adding two 'bangs' in front of our check. This can all be done in one line. TRY IT YOURSELF BEFORE LOOKING AT THE CODE BELOW.
+
+        const chatAlreadyExists = (recipientEmail) => !!chatsSnapshot?.docs?
+            .find(chat => chat.data().users
+                .find(user => user === recipientEmail)?.length > 0
+            )
+
+This function that we just created will be our third condition in order to created a new document. We don't want to create a new document, which in this case a document equals a new chat, if the chat already exists. So the final condition will look like this...
+
+        if ( EmailValidator.validate(input) && !chatAlreadyExists(input) && input !== user.email ) {}
+
+Notice that there's a bang in front of the `chatAlreadyExists(input)`. This is because if it that doesn't exist it will return false and we want to negate that so that it's true and the condition will be met.
+
+There's is one more thing that we want to accomplish within the `createChat()` function and that's to route the sender to the chat that they just created, but to do this we will need to create the chat page and component, so we'll do this later on.
+
+Besides that, this function is complete, and we can move on to the next step.
 
 
 ## Steps.... 
